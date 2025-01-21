@@ -1,0 +1,51 @@
+{
+  "name": "passwordless",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next",
+    "test": "ava"
+  },
+  "ava": {
+    "extensions": {
+      "ts": "module"
+    },
+    "environmentVariables": {
+      "TESTING": "true",
+      "JWT_TOKEN": "91289182391832"
+    },
+    "nodeArguments": [
+      "--import=tsimp"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ava": "^6.2.0",
+    "date-fns": "^4.1.0",
+    "firebase-admin": "^13.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "micro": "^10.0.1",
+    "micro-method-router": "^0.1.0",
+    "next": "^15.1.3",
+    "nodemailer": "^6.9.16",
+    "parse-bearer-token": "^1.0.1",
+    "random-seed": "^0.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsimp": "^2.0.12"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "22.10.5",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "19.0.2",
+    "tsx": "^4.19.2",
+    "typescript": "5.7.2"
+  }
+}
