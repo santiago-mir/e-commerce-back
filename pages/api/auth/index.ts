@@ -1,10 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import methods from "micro-method-router";
-import { sendCode } from "lib/controllers/auth";
+import { findOrCreateUser } from "controllers/users";
 export default methods({
   async post(req: NextApiRequest, res: NextApiResponse) {
-    const { email } = req.body;
-    await sendCode(email);
-    res.status(200).send({ message: "verification code send to user email" });
+    try {
+      const { email, userName } = req.body;
+      const response = await findOrCreateUser(email, userName);
+      res.status(200).send({
+        message: "User " + userName + " found",
+        res: response.message,
+      });
+    } catch (e) {
+      res.status(400).send({ message: e });
+    }
   },
 });

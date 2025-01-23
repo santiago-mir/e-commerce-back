@@ -1,5 +1,12 @@
 import * as nodemailer from "nodemailer";
-async function sendEmail(toEmail: string, verificationCode: number) {
+
+type emailResponse = {
+  message: string;
+};
+async function sendEmail(
+  toEmail: string,
+  verificationCode: number
+): Promise<emailResponse> {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -13,22 +20,23 @@ async function sendEmail(toEmail: string, verificationCode: number) {
 
   const mailOptions = {
     from: {
-      name: "Passwordless test",
+      name: "Verification Code",
       address: process.env.USER_EMAIL,
     }, // sender address
     to: [toEmail], // list of receivers
-    subject: `Testing Passwordless auth`, // Subject line
+    subject: `Codigo para verificar ingreso`, // Subject line
     text: "", // plain text body
     html: `<b>Este es el codigo para verificar tu ingreso: ${verificationCode} </b>`, // html body
   };
   const sendMail = async (transporter, mailOptions) => {
     try {
-      await transporter.sendMail(mailOptions);
-      console.log("email enviado ok");
+      const res = await transporter.sendMail(mailOptions);
+      return { message: res.response };
     } catch (error) {
       console.error(error);
     }
   };
-  sendMail(transporter, mailOptions);
+  const response: emailResponse = await sendMail(transporter, mailOptions);
+  return response;
 }
 export { sendEmail };

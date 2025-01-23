@@ -1,0 +1,70 @@
+import { User, Auth } from "models/models";
+import { generateCodeAndExpiresDate } from "lib/date-fns";
+import { findOrCreateAuth } from "./auth";
+import { sendEmail } from "lib/nodemailer";
+type findOrCreateUserResponse = {
+  message: string;
+};
+export async function findOrCreateUser(
+  email: string,
+  userName: string
+): Promise<findOrCreateUserResponse> {
+  const createdOrNewuser: User = await User.findOrCreateUser(email, userName);
+  if (!createdOrNewuser) {
+    return null;
+  } else {
+    const userId: number = createdOrNewuser.id;
+    const { code, expires } = generateCodeAndExpiresDate();
+    const createdOrNewAuth: Auth = await findOrCreateAuth(
+      email,
+      userId,
+      code,
+      expires
+    );
+    if (!createdOrNewAuth) {
+      return null;
+    } else {
+      const response = await sendEmail(email, code);
+      return {
+        message:
+          "email sent to: " + email + " with response: " + response.message,
+      };
+    }
+  }
+}
+
+// export async function getCodeStatus(email: string, code: number) {
+//   const cleanEmail = email.trim().toLowerCase();
+//   const auth = await Auth.findByEmail(cleanEmail);
+//   if (auth) {
+//     const authCode = auth.data.code;
+//     const expiresDate = new Date(
+//       auth.data.expires._seconds * 1000 +
+//         auth.data.expires._nanoseconds / 1000000
+//     );
+//     const now = new Date();
+//     if (code == authCode && expiresDate > now) {
+//       const userId = auth.data.userId;
+//       const userEmail = auth.data.email;
+//       const res = {
+//         userEmail,
+//         userId,
+//       };
+//       return res;
+//     }
+//   } else {
+//     return null;
+//   }
+// }
+
+// export async function sendCode(email: string) {
+//   const auth = await findOrCreateAuth(email);
+//   const code = Math.floor(10000 + Math.random() * 90000);
+//   const now = new Date();
+//   const twentyFromNow = addMinutes(now, 20);
+//   auth.data.code = code;
+//   auth.data.expires = twentyFromNow;
+//   await auth.push();
+//   await sendEmail(email, code);
+//   return auth;
+// }
