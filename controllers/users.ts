@@ -2,8 +2,15 @@ import { User, Auth } from "models/models";
 import { generateCodeAndExpiresDate } from "lib/date-fns";
 import { findOrCreateAuth } from "./auth";
 import { sendEmail } from "lib/nodemailer";
+import { or } from "sequelize";
 type findOrCreateUserResponse = {
   message: string;
+};
+type findByEmailResponse = {
+  id: number;
+  name: string;
+  email: string;
+  address: string | null;
 };
 export async function findOrCreateUser(
   email: string,
@@ -31,6 +38,18 @@ export async function findOrCreateUser(
       };
     }
   }
+}
+export async function findUserByEmail(
+  email: string
+): Promise<findByEmailResponse> {
+  const userFound: User = await User.findByEmail(email);
+  const userData = {
+    id: userFound.id,
+    name: userFound.name,
+    email: userFound.email,
+    address: userFound.address,
+  };
+  return userData;
 }
 
 // export async function getCodeStatus(email: string, code: number) {

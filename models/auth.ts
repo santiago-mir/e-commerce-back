@@ -35,10 +35,16 @@ export class Auth extends Model<
     });
     return [auth, created];
   }
+  static async findByEmail(email: string): Promise<Auth> {
+    const authFound = await Auth.findOne({
+      where: { email },
+    });
+    return authFound;
+  }
   static async updateCodeAndDate(
-    newCode: number,
-    newDate: Date,
-    email: string
+    email: string,
+    newDate?: Date,
+    newCode?: number
   ) {
     const res = await Auth.update(
       {
@@ -62,8 +68,8 @@ Auth.init(
       autoIncrement: true,
     },
     email: { type: DataTypes.STRING, allowNull: false },
-    validationCode: { type: DataTypes.INTEGER, allowNull: false },
-    expireDate: { type: DataTypes.DATE, allowNull: false },
+    validationCode: { type: DataTypes.INTEGER, allowNull: true },
+    expireDate: { type: DataTypes.DATE, allowNull: true },
     // foreign key
     UserId: { type: DataTypes.INTEGER, allowNull: false },
   },

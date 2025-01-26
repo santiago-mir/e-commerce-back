@@ -28,6 +28,14 @@ export class User extends Model<
     });
     return user;
   }
+  static async findByEmail(email: string): Promise<User> {
+    const userFound = await User.findOne({
+      where: {
+        email,
+      },
+    });
+    return userFound;
+  }
 }
 User.init(
   {

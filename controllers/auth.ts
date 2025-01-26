@@ -13,7 +13,27 @@ export async function findOrCreateAuth(
     expires
   );
   if (!created) {
-    await Auth.updateCodeAndDate(code, expires, email);
+    await Auth.updateCodeAndDate(email, expires, code);
   }
   return auth;
+}
+
+export async function getCodeStatus(
+  email: string,
+  code: number
+): Promise<boolean> {
+  const auth = await Auth.findByEmail(email);
+  if (!auth) {
+    return null;
+  } else {
+    const { validationCode, expireDate } = auth;
+    const now = new Date();
+    if (code == validationCode && expireDate > now) {
+      // invalidate code
+      await Auth.updateCodeAndDate(email, now);
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
