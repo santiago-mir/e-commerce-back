@@ -36,6 +36,26 @@ export class User extends Model<
     });
     return userFound;
   }
+  static async updateUserInfo(
+    currentEmail: string,
+    fieldsToUpdate: Partial<{
+      newName: string;
+      newEmail: string;
+      newAddress: string;
+    }>
+  ) {
+    const res = await User.update(
+      {
+        name: fieldsToUpdate.newName,
+        email: fieldsToUpdate.newEmail,
+        address: fieldsToUpdate.newAddress,
+      },
+      {
+        where: { email: currentEmail },
+      }
+    );
+    return res;
+  }
 }
 User.init(
   {

@@ -52,6 +52,18 @@ export async function findUserByEmail(
   return userData;
 }
 
+export async function updateUserData(
+  currentEmail: string,
+  fieldsToUpdate: Partial<{
+    newName: string;
+    newEmail: string;
+    newAddress: string;
+  }>
+) {
+  const response = await User.updateUserInfo(currentEmail, fieldsToUpdate);
+  return response;
+}
+
 // export async function getCodeStatus(email: string, code: number) {
 //   const cleanEmail = email.trim().toLowerCase();
 //   const auth = await Auth.findByEmail(cleanEmail);

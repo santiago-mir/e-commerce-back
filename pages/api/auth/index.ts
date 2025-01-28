@@ -7,7 +7,7 @@ export default methods({
       const { email, userName } = req.body;
       const response = await findOrCreateUser(email, userName);
       res.status(200).send({
-        message: "User " + userName + " found",
+        message: "User found",
         res: response.message,
       });
     } catch (e) {
