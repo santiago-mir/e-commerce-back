@@ -56,6 +56,17 @@ export class User extends Model<
     );
     return res;
   }
+  static async updateUserAdress(currentEmail: string, newAddress: string) {
+    const res = await User.update(
+      {
+        address: newAddress,
+      },
+      {
+        where: { email: currentEmail },
+      }
+    );
+    return res;
+  }
 }
 User.init(
   {

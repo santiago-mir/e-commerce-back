@@ -64,6 +64,14 @@ export async function updateUserData(
   return response;
 }
 
+export async function updateUserAdress(
+  currentEmail: string,
+  newAddress: string
+) {
+  const response = await User.updateUserAdress(currentEmail, newAddress);
+  return response;
+}
+
 // export async function getCodeStatus(email: string, code: number) {
 //   const cleanEmail = email.trim().toLowerCase();
 //   const auth = await Auth.findByEmail(cleanEmail);
