@@ -6,7 +6,7 @@ import {
   CreationOptional,
   where,
 } from "sequelize";
-import { sequelize } from "db/index";
+import { sequelize } from "db/sequelize";
 
 export class Auth extends Model<
   InferAttributes<Auth>,

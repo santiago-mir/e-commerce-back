@@ -26,6 +26,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "algoliasearch": "^5.20.0",
     "ava": "^6.2.0",
     "date-fns": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
