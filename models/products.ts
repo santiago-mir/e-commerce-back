@@ -3,10 +3,10 @@
 import { SearchResponse } from "algoliasearch";
 import { client } from "db/algolia";
 
-export class Products {
+export class Product {
   static index: string = "products";
 
-  static async getAllProducts(
+  static async getProducts(
     query: string,
     limit: number,
     offset: number
@@ -17,6 +17,7 @@ export class Products {
         query,
         hitsPerPage: limit,
         page: offset,
+        filters: "Stock:true",
       },
     });
     return response;
