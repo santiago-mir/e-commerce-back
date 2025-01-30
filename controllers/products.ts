@@ -15,7 +15,12 @@ export async function getProducts(
   offset: number
 ) {
   const algoliaOffset = Math.floor(offset / limit);
-  const inStockHits = await Product.getProducts(query, limit, algoliaOffset);
+  const inStockHits = await Product.getProducts(
+    query,
+    limit,
+    algoliaOffset,
+    true
+  );
   const formatResponse: getProductsResponse = {
     products: inStockHits.hits,
     numberOfProducts: inStockHits.nbHits,
@@ -25,4 +30,10 @@ export async function getProducts(
     query,
   };
   return formatResponse;
+}
+export async function getSingleProduct(
+  productId: string
+): Promise<Record<string, unknown>> {
+  const singleProduct = await Product.getSingleProduct(productId);
+  return singleProduct;
 }

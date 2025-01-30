@@ -1,6 +1,6 @@
 // using algolia
 
-import { SearchResponse } from "algoliasearch";
+import { SearchParams, SearchResponse } from "algoliasearch";
 import { client } from "db/algolia";
 
 export class Product {
@@ -9,16 +9,30 @@ export class Product {
   static async getProducts(
     query: string,
     limit: number,
-    offset: number
+    offset: number,
+    filterStock?: boolean
   ): Promise<SearchResponse<unknown>> {
+    const searchParams: SearchParams = {
+      query,
+      hitsPerPage: limit,
+      page: offset,
+    };
+    if (filterStock) {
+      searchParams.filters = "Stock:true";
+    }
     const response = await client.searchSingleIndex({
       indexName: this.index,
-      searchParams: {
-        query,
-        hitsPerPage: limit,
-        page: offset,
-        filters: "Stock:true",
-      },
+      searchParams,
+    });
+    return response;
+  }
+
+  static async getSingleProduct(
+    productId: string
+  ): Promise<Record<string, unknown>> {
+    const response = await client.getObject({
+      indexName: this.index,
+      objectID: productId,
     });
     return response;
   }
