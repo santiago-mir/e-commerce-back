@@ -1,8 +1,10 @@
-import { User, Auth } from "models/models";
+import { User, Auth, Order } from "models/models";
 import { generateCodeAndExpiresDate } from "lib/date-fns";
 import { findOrCreateAuth } from "./auth";
 import { sendEmail } from "lib/nodemailer";
-import { or } from "sequelize";
+import { createSingleProductPreference } from "lib/mercadopago";
+import { getSingleProduct } from "./products";
+import { v4 as uuidv4 } from "uuid";
 type findOrCreateUserResponse = {
   message: string;
 };
@@ -72,38 +74,33 @@ export async function updateUserAdress(
   return response;
 }
 
-// export async function getCodeStatus(email: string, code: number) {
-//   const cleanEmail = email.trim().toLowerCase();
-//   const auth = await Auth.findByEmail(cleanEmail);
-//   if (auth) {
-//     const authCode = auth.data.code;
-//     const expiresDate = new Date(
-//       auth.data.expires._seconds * 1000 +
-//         auth.data.expires._nanoseconds / 1000000
-//     );
-//     const now = new Date();
-//     if (code == authCode && expiresDate > now) {
-//       const userId = auth.data.userId;
-//       const userEmail = auth.data.email;
-//       const res = {
-//         userEmail,
-//         userId,
-//       };
-//       return res;
-//     }
-//   } else {
-//     return null;
-//   }
-// }
+type OrderResponse = {
+  orderId: string;
+  mercadoPagoURL: string;
+};
 
-// export async function sendCode(email: string) {
-//   const auth = await findOrCreateAuth(email);
-//   const code = Math.floor(10000 + Math.random() * 90000);
-//   const now = new Date();
-//   const twentyFromNow = addMinutes(now, 20);
-//   auth.data.code = code;
-//   auth.data.expires = twentyFromNow;
-//   await auth.push();
-//   await sendEmail(email, code);
-//   return auth;
-// }
+export async function generateOrder(
+  productId: string,
+  userId: number
+): Promise<OrderResponse> {
+  const productData = await getSingleProduct(productId);
+  const newId: string = uuidv4();
+  const newOrder = await Order.createNewOrder(
+    productId,
+    productData.unit_cost,
+    newId,
+    userId
+  );
+  const newPref = await createSingleProductPreference({
+    productName: productData.name,
+    productDescription: productData.description,
+    productId: productData.id,
+    productPrice: productData.unit_cost,
+    transactionId: productData.id,
+  });
+  const response: OrderResponse = {
+    orderId: newOrder.dataValues.id,
+    mercadoPagoURL: newPref.init_point,
+  };
+  return response;
+}

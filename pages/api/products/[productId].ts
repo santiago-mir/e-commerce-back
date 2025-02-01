@@ -6,6 +6,6 @@ export default methods({
   async get(req: NextApiRequest, res: NextApiResponse) {
     const productId = req.query.productId as string;
     const response = await getSingleProduct(productId);
-    res.status(200).json({ productData: response });
+    res.status(200).json(response);
   },
 });

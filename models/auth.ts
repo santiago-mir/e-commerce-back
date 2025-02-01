@@ -3,8 +3,6 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
-  where,
 } from "sequelize";
 import { sequelize } from "db/sequelize";
 
