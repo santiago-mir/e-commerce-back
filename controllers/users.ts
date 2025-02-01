@@ -2,9 +2,7 @@ import { User, Auth, Order } from "models/models";
 import { generateCodeAndExpiresDate } from "lib/date-fns";
 import { findOrCreateAuth } from "./auth";
 import { sendEmail } from "lib/nodemailer";
-import { createSingleProductPreference } from "lib/mercadopago";
-import { getSingleProduct } from "./products";
-import { v4 as uuidv4 } from "uuid";
+
 type findOrCreateUserResponse = {
   message: string;
 };
@@ -71,36 +69,5 @@ export async function updateUserAdress(
   newAddress: string
 ) {
   const response = await User.updateUserAdress(currentEmail, newAddress);
-  return response;
-}
-
-type OrderResponse = {
-  orderId: string;
-  mercadoPagoURL: string;
-};
-
-export async function generateOrder(
-  productId: string,
-  userId: number
-): Promise<OrderResponse> {
-  const productData = await getSingleProduct(productId);
-  const newId: string = uuidv4();
-  const newOrder = await Order.createNewOrder(
-    productId,
-    productData.unit_cost,
-    newId,
-    userId
-  );
-  const newPref = await createSingleProductPreference({
-    productName: productData.name,
-    productDescription: productData.description,
-    productId: productData.id,
-    productPrice: productData.unit_cost,
-    transactionId: productData.id,
-  });
-  const response: OrderResponse = {
-    orderId: newOrder.dataValues.id,
-    mercadoPagoURL: newPref.init_point,
-  };
   return response;
 }

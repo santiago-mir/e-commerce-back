@@ -22,7 +22,7 @@ export class Order extends Model<
     orderId: string,
     userId: number
   ): Promise<Order> {
-    const createOrder = Order.create({
+    const createOrder = await Order.create({
       id: orderId,
       productId,
       amount: productValue,
@@ -30,6 +30,18 @@ export class Order extends Model<
       UserId: userId,
     });
     return createOrder;
+  }
+  static async getAllOrders(userId: number): Promise<Order[]> {
+    const allOrders = await Order.findAll({
+      where: {
+        UserId: userId,
+      },
+    });
+    return allOrders;
+  }
+  static async getSingleOrder(orderId: string): Promise<Order> {
+    const orderFound = await Order.findByPk(orderId);
+    return orderFound;
   }
 }
 Order.init(
@@ -41,7 +53,7 @@ Order.init(
     },
     productId: { type: DataTypes.STRING, allowNull: false },
     status: { type: DataTypes.STRING, allowNull: false },
-    amount: { type: DataTypes.INTEGER, allowNull: false },
+    amount: { type: DataTypes.FLOAT, allowNull: false },
     // foreign key
     UserId: { type: DataTypes.INTEGER, allowNull: false },
   },
