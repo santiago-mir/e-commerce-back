@@ -36,22 +36,26 @@ export class User extends Model<
     });
     return userFound;
   }
+  static async getUserData(id: number): Promise<User> {
+    const userFound = await User.findByPk(id);
+    return userFound;
+  }
   static async updateUserInfo(
-    currentEmail: string,
+    userId: number,
     fieldsToUpdate: Partial<{
-      newName: string;
-      newEmail: string;
-      newAddress: string;
+      name: string;
+      email: string;
+      address: string;
     }>
   ) {
     const res = await User.update(
       {
-        name: fieldsToUpdate.newName,
-        email: fieldsToUpdate.newEmail,
-        address: fieldsToUpdate.newAddress,
+        name: fieldsToUpdate.name,
+        email: fieldsToUpdate.email,
+        address: fieldsToUpdate.address,
       },
       {
-        where: { email: currentEmail },
+        where: { id: userId },
       }
     );
     return res;

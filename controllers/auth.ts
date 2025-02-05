@@ -24,7 +24,7 @@ export async function getCodeStatus(
 ): Promise<boolean> {
   const auth = await Auth.findByEmail(email);
   if (!auth) {
-    return null;
+    throw "El email es incorrecto o no existe";
   } else {
     const { validationCode, expireDate } = auth;
     const now = new Date();
@@ -33,7 +33,7 @@ export async function getCodeStatus(
       await Auth.updateCodeAndDate(email, now);
       return true;
     } else {
-      return false;
+      throw "El token es incorrecto o ya ha expirado";
     }
   }
 }

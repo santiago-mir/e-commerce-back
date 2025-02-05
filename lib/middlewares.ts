@@ -17,3 +17,17 @@ export function authMiddleware(callback) {
     }
   };
 }
+
+export function bodySchemaMiddleware(schema, callback) {
+  return async function (req: NextApiRequest, res: NextApiResponse) {
+    try {
+      await schema.validate(req.body);
+      callback(req, res);
+    } catch (err) {
+      res.status(400).send({
+        message: "information missing",
+        err,
+      });
+    }
+  };
+}

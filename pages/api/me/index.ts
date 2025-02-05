@@ -1,23 +1,43 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { userData } from "types";
-import { authMiddleware } from "lib/middlewares";
-import { updateUserData } from "controllers/users";
+import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
+import { updateUserData, getUserData } from "controllers/users";
 import methods from "micro-method-router";
-
-const handler = methods({
+import { object, string } from "yup";
+let patchBodySchema = object({
+  email: string().email().notRequired(),
+  name: string().notRequired(),
+  address: string().notRequired(),
+})
+  .noUnknown()
+  .strict()
+  .test(
+    "body not empty",
+    "El body no puede estar vacio",
+    (body) => Object.keys(body).length > 0
+  );
+const rawHandler = methods({
   async get(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
-    res.status(200).send({ ...payLoad.userData });
+    const userId = payLoad.userData.id;
+    const userData = await getUserData(userId);
+    res.status(200).send(userData);
   },
   async patch(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
-    const fields = req.body.fields;
-    const currentEmail = payLoad.userData.email;
-    const response = await updateUserData(currentEmail, fields);
-    if (response) {
-      res.send({ message: "user data updated successfully", data: response });
-    } else {
-      res.status(400).send({ message: "error updating user data" });
+    try {
+      const fields = req.body;
+      const userId = payLoad.userData.id;
+      const response = await updateUserData(userId, fields);
+      res.send(response);
+    } catch (err) {
+      res.status(400).send({ message: err });
     }
   },
 });
 
-export default authMiddleware(handler);
+const protectedHandler = authMiddleware(rawHandler);
+
+export default methods({
+  get: protectedHandler,
+  patch: bodySchemaMiddleware(patchBodySchema, protectedHandler),
+});
+// export default bodySchemaMiddleware(patchBodySchema, authMiddleware(handler));

@@ -43,7 +43,8 @@
     "react-dom": "^19.0.0",
     "sequelize": "^6.37.5",
     "tsimp": "^2.0.12",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.7",

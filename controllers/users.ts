@@ -8,59 +8,86 @@ type findOrCreateUserResponse = {
 };
 type findByEmailResponse = {
   id: number;
+};
+
+type getUserDataResponse = {
+  id: number;
   name: string;
   email: string;
-  address: string | null;
+  address: string;
 };
-export async function findOrCreateUser(
+type updateUserDataResponse = {
+  message: string;
+  fieldsUpdated: number;
+};
+
+export async function authUser(
   email: string,
-  userName: string
+  userName?: string
 ): Promise<findOrCreateUserResponse> {
-  const createdOrNewuser: User = await User.findOrCreateUser(email, userName);
-  if (!createdOrNewuser) {
-    return null;
+  let userFoundOrCreated: User | findByEmailResponse;
+  if (userName) {
+    userFoundOrCreated = await User.findOrCreateUser(email, userName);
   } else {
-    const userId: number = createdOrNewuser.id;
-    const { code, expires } = generateCodeAndExpiresDate();
-    const createdOrNewAuth: Auth = await findOrCreateAuth(
-      email,
-      userId,
-      code,
-      expires
-    );
-    if (!createdOrNewAuth) {
-      return null;
-    } else {
-      const response = await sendEmail(email, code);
-      return {
-        message:
-          "email sent to: " + email + " with response: " + response.message,
-      };
-    }
+    userFoundOrCreated = await findUserByEmail(email);
+  }
+  if (!userFoundOrCreated) {
+    throw "El usuario no pudo ser creado correctamente";
+  }
+  const userId: number = userFoundOrCreated.id;
+  const { code, expires } = generateCodeAndExpiresDate();
+  const createdOrNewAuth: Auth = await findOrCreateAuth(
+    email,
+    userId,
+    code,
+    expires
+  );
+  if (!createdOrNewAuth) {
+    throw "El registro auth no pudo ser creado correctamente";
+  } else {
+    const response = await sendEmail(email, code);
+    console.log(code);
+    return {
+      message:
+        "email sent to: " + email + " with response: " + response.message,
+    };
   }
 }
 export async function findUserByEmail(
   email: string
 ): Promise<findByEmailResponse> {
   const userFound: User = await User.findByEmail(email);
-  const userData = {
-    id: userFound.id,
-    name: userFound.name,
-    email: userFound.email,
-    address: userFound.address,
+  if (!userFound) {
+    throw "El mail no esta asociado a un usuario valido";
+  }
+  const userId = { id: userFound.id };
+  return userId;
+}
+
+export async function getUserData(id: number): Promise<getUserDataResponse> {
+  const userFound: User = await User.getUserData(id);
+  const response: getUserDataResponse = {
+    id: userFound.dataValues.id,
+    name: userFound.dataValues.name,
+    email: userFound.dataValues.email,
+    address: userFound.dataValues.address,
   };
-  return userData;
+  return response;
 }
 
 export async function updateUserData(
-  currentEmail: string,
+  userId: number,
   fieldsToUpdate: Partial<{
-    newName: string;
-    newEmail: string;
-    newAddress: string;
+    name: string;
+    email: string;
+    address: string;
   }>
 ) {
-  const response = await User.updateUserInfo(currentEmail, fieldsToUpdate);
+  const fieldsUpdated = await User.updateUserInfo(userId, fieldsToUpdate);
+  const response: updateUserDataResponse = {
+    fieldsUpdated: fieldsUpdated[0],
+    message: "Se ha actualizado la data correctamente",
+  };
   return response;
 }
 
