@@ -92,9 +92,13 @@ export async function updateUserData(
 }
 
 export async function updateUserAdress(
-  currentEmail: string,
+  userId: number,
   newAddress: string
-) {
-  const response = await User.updateUserAdress(currentEmail, newAddress);
+): Promise<updateUserDataResponse> {
+  const fieldsUpdated = await User.updateUserAdress(userId, newAddress);
+  const response: updateUserDataResponse = {
+    fieldsUpdated: fieldsUpdated[0],
+    message: "El campo address fue actualizado correctamente",
+  };
   return response;
 }

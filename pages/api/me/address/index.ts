@@ -1,32 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { authMiddleware } from "lib/middlewares";
+import type { userData } from "types";
+import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
 import { updateUserAdress } from "controllers/users";
 import methods from "micro-method-router";
+import { object, string } from "yup";
 
-type userData = {
-  userData: {
-    id: number;
-    name: string;
-    email: string;
-    address: string | null;
-  };
-  iat: number;
-};
+let addressBodySchema = object({
+  address: string().required(),
+})
+  .noUnknown()
+  .strict()
+  .test(
+    "body not empty",
+    "El body no puede estar vacio",
+    (body) => Object.keys(body).length > 0
+  );
 
 const handler = methods({
   async patch(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
-    const { newAddress } = req.body;
-    const currentEmail = payLoad.userData.email;
-    const response = await updateUserAdress(currentEmail, newAddress);
-    if (response) {
-      res.send({
-        message: "user adrress updated successfully",
-        data: response,
-      });
-    } else {
-      res.status(400).send({ message: "error updating user data" });
-    }
+    const { address } = req.body;
+    const userId: number = payLoad.userData.id;
+    const response = await updateUserAdress(userId, address);
+    res.send(response);
   },
 });
 
-export default authMiddleware(handler);
+export default bodySchemaMiddleware(addressBodySchema, authMiddleware(handler));

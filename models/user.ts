@@ -60,13 +60,13 @@ export class User extends Model<
     );
     return res;
   }
-  static async updateUserAdress(currentEmail: string, newAddress: string) {
+  static async updateUserAdress(userId: number, newAddress: string) {
     const res = await User.update(
       {
         address: newAddress,
       },
       {
-        where: { email: currentEmail },
+        where: { id: userId },
       }
     );
     return res;

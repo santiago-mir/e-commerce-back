@@ -4,6 +4,7 @@ import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
 import { updateUserData, getUserData } from "controllers/users";
 import methods from "micro-method-router";
 import { object, string } from "yup";
+
 let patchBodySchema = object({
   email: string().email().notRequired(),
   name: string().notRequired(),
@@ -40,4 +41,3 @@ export default methods({
   get: protectedHandler,
   patch: bodySchemaMiddleware(patchBodySchema, protectedHandler),
 });
-// export default bodySchemaMiddleware(patchBodySchema, authMiddleware(handler));
