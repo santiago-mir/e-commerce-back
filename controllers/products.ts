@@ -49,6 +49,7 @@ export async function getProducts(
   };
   return formatResponse;
 }
+
 export async function getSingleProduct(
   productId: string
 ): Promise<productData> {
