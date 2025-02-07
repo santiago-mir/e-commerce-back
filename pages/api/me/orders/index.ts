@@ -3,6 +3,7 @@ import { getAllOrders } from "controllers/orders";
 import methods from "micro-method-router";
 import { userData } from "types";
 import { authMiddleware } from "lib/middlewares";
+
 const handler = methods({
   async get(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
     const userId = payLoad.userData.id;

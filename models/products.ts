@@ -30,10 +30,14 @@ export class Product {
   static async getSingleProduct(
     productId: string
   ): Promise<Record<string, unknown>> {
-    const response = await client.getObject({
-      indexName: this.index,
-      objectID: productId,
-    });
-    return response;
+    try {
+      const response = await client.getObject({
+        indexName: this.index,
+        objectID: productId,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
   }
 }

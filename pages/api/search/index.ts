@@ -2,13 +2,13 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import methods from "micro-method-router";
 import { getLimitAndOffset } from "lib/requests";
 import { getProducts } from "controllers/products";
-import { number, object, string } from "yup";
+import { object, string } from "yup";
 import { querySchemaMiddleware } from "lib/middlewares";
 
 let querySchema = object({
   q: string().notRequired(),
-  limit: number().notRequired(),
-  offset: number().notRequired(),
+  limit: string().notRequired(),
+  offset: string().notRequired(),
 })
   .noUnknown()
   .strict();

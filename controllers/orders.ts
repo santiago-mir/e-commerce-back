@@ -11,26 +11,30 @@ export async function generateOrder(
   productId: string,
   userId: number
 ): Promise<NewOrderResponse> {
-  const productData = await getSingleProduct(productId);
-  const newId: string = uuidv4();
-  const newOrder = await Order.createNewOrder(
-    productId,
-    productData.unit_cost,
-    newId,
-    userId
-  );
-  const newPref = await createSingleProductPreference({
-    productName: productData.name,
-    productDescription: productData.description,
-    productId: productData.id,
-    productPrice: productData.unit_cost,
-    transactionId: productData.id,
-  });
-  const response: NewOrderResponse = {
-    orderId: newOrder.dataValues.id,
-    mercadoPagoURL: newPref.init_point,
-  };
-  return response;
+  try {
+    const productData = await getSingleProduct(productId);
+    const newId: string = uuidv4();
+    const newOrder = await Order.createNewOrder(
+      productId,
+      productData.unit_cost,
+      newId,
+      userId
+    );
+    const newPref = await createSingleProductPreference({
+      productName: productData.name,
+      productDescription: productData.description,
+      productId: productData.id,
+      productPrice: productData.unit_cost,
+      transactionId: productData.id,
+    });
+    const response: NewOrderResponse = {
+      orderId: newOrder.dataValues.id,
+      mercadoPagoURL: newPref.init_point,
+    };
+    return response;
+  } catch (err) {
+    throw err;
+  }
 }
 
 type GetOrderResponse = {
@@ -60,6 +64,9 @@ export async function getSingleOrder(
   orderId: string
 ): Promise<GetOrderResponse> {
   const singleOrder = await Order.getSingleOrder(orderId);
+  if (!singleOrder) {
+    throw "El ID no esta asociado a una Orden valida";
+  }
   const formatResponse: GetOrderResponse = {
     orderId: singleOrder.dataValues.id,
     amount: singleOrder.dataValues.amount,
