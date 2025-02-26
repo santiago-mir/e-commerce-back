@@ -2,6 +2,9 @@ import { getSingleProduct } from "./products";
 import { createSingleProductPreference } from "lib/mercadopago";
 import { v4 as uuidv4 } from "uuid";
 import { Order } from "models/orders";
+import { sendConfirmOrderEmail, sendVerificationEmail } from "lib/nodemailer";
+import { User } from "models/user";
+import { airtableBase } from "lib/airtable";
 type NewOrderResponse = {
   orderId: string;
   mercadoPagoURL: string;
@@ -13,11 +16,12 @@ export async function generateOrder(
 ): Promise<NewOrderResponse> {
   try {
     const productData = await getSingleProduct(productId);
-    const newId: string = uuidv4();
+    const newOrderId: string = uuidv4();
     const newOrder = await Order.createNewOrder(
+      productData.name,
       productId,
       productData.unit_cost,
-      newId,
+      newOrderId,
       userId
     );
     const newPref = await createSingleProductPreference({
@@ -25,7 +29,7 @@ export async function generateOrder(
       productDescription: productData.description,
       productId: productData.id,
       productPrice: productData.unit_cost,
-      transactionId: productData.id,
+      transactionId: newOrderId,
     });
     const response: NewOrderResponse = {
       orderId: newOrder.dataValues.id,
@@ -39,6 +43,7 @@ export async function generateOrder(
 
 type GetOrderResponse = {
   orderId: string;
+  productName: string;
   productId: string;
   status: string;
   amount: number;
@@ -51,6 +56,7 @@ export async function getAllOrders(
   const formatResponse = allOrders.map((ord) => {
     let formatOrder: GetOrderResponse = {
       orderId: ord.dataValues.id,
+      productName: ord.dataValues.name,
       productId: ord.dataValues.productId,
       amount: ord.dataValues.amount,
       status: ord.dataValues.status,
@@ -69,9 +75,48 @@ export async function getSingleOrder(
   }
   const formatResponse: GetOrderResponse = {
     orderId: singleOrder.dataValues.id,
+    productName: singleOrder.dataValues.name,
     amount: singleOrder.dataValues.amount,
     productId: singleOrder.dataValues.productId,
     status: singleOrder.dataValues.status,
   };
   return formatResponse;
+}
+
+type confirmOrderResponse = {
+  message: string;
+};
+
+export async function confirmOrder(
+  orderId: string
+): Promise<confirmOrderResponse> {
+  const affectedFields = await Order.confirmOrder(orderId);
+  if (affectedFields[0] == 0) {
+    throw "La orden ya fue confirmada";
+  }
+  try {
+    const orderData = await getSingleOrder(orderId);
+    const userData = await User.getUserByOrderId(orderId);
+    // generate delivery record
+    await airtableBase("Delivery").create({
+      productName: orderData.productName,
+      produdctId: orderData.productId,
+      owner: userData.dataValues.email,
+      address: userData.dataValues.address,
+    });
+    // send confirmation email
+    const emailResponse = await sendConfirmOrderEmail(
+      userData.dataValues.email,
+      orderData.productName
+    );
+    return {
+      message:
+        "purchase confimation email sent to: " +
+        userData.dataValues.email +
+        " with response: " +
+        emailResponse.message,
+    };
+  } catch (err) {
+    throw err;
+  }
 }

@@ -13,7 +13,7 @@ const handler = methods({
       const { email, userName } = req.body;
       const response = await authUser(email, userName);
       res.status(200).send({
-        message: "User found",
+        message: "User found or created",
         res: response.message,
       });
     } catch (e) {

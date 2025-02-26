@@ -6,6 +6,7 @@ import {
   CreationOptional,
 } from "sequelize";
 import { sequelize } from "db/sequelize";
+import { Order } from "./orders";
 
 export class User extends Model<
   InferAttributes<User>,
@@ -32,6 +33,15 @@ export class User extends Model<
     const userFound = await User.findOne({
       where: {
         email,
+      },
+    });
+    return userFound;
+  }
+  static async getUserByOrderId(orderId: string): Promise<User> {
+    const userFound = await User.findOne({
+      include: {
+        model: Order,
+        where: { id: orderId },
       },
     });
     return userFound;

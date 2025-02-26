@@ -1,7 +1,7 @@
 import { User, Auth, Order } from "models/models";
 import { generateCodeAndExpiresDate } from "lib/date-fns";
 import { findOrCreateAuth } from "./auth";
-import { sendEmail } from "lib/nodemailer";
+import { sendVerificationEmail } from "lib/nodemailer";
 
 type findOrCreateUserResponse = {
   message: string;
@@ -45,8 +45,7 @@ export async function authUser(
   if (!createdOrNewAuth) {
     throw "El registro auth no pudo ser creado correctamente";
   } else {
-    const response = await sendEmail(email, code);
-    console.log(code);
+    const response = await sendVerificationEmail(email, code);
     return {
       message:
         "email sent to: " + email + " with response: " + response.message,
