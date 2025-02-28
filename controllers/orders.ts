@@ -90,17 +90,14 @@ type confirmOrderResponse = {
 export async function confirmOrder(
   orderId: string
 ): Promise<confirmOrderResponse> {
-  const affectedFields = await Order.confirmOrder(orderId);
-  if (affectedFields[0] == 0) {
-    throw "La orden ya fue confirmada";
-  }
   try {
+    await Order.confirmOrder(orderId);
     const orderData = await getSingleOrder(orderId);
     const userData = await User.getUserByOrderId(orderId);
-    // generate delivery record
+    // // generate delivery record
     await airtableBase("Delivery").create({
       productName: orderData.productName,
-      produdctId: orderData.productId,
+      productId: orderData.productId,
       owner: userData.dataValues.email,
       address: userData.dataValues.address,
     });

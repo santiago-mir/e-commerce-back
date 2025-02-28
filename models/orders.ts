@@ -36,15 +36,22 @@ export class Order extends Model<
     return createOrder;
   }
   static async confirmOrder(orderId: string) {
-    const confirmedOrder = await Order.update(
-      {
-        status: "approved",
-      },
-      {
-        where: { id: orderId },
-      }
+    const order = await Order.findOne({
+      where: { id: orderId },
+      attributes: ["status"],
+    });
+    if (!order) {
+      throw new Error("El ID no esta asociado a ninguna Orden valida");
+    }
+    if (order.status === "approved") {
+      throw "La orden de compra ya fue confirmada anteriormente";
+    }
+    const affectedFields = await Order.update(
+      { status: "approved" },
+      { where: { id: orderId } }
     );
-    return confirmedOrder;
+
+    return affectedFields;
   }
   static async getAllOrders(userId: number): Promise<Order[]> {
     const allOrders = await Order.findAll({
