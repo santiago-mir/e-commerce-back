@@ -27,6 +27,13 @@ export class Product {
     return response;
   }
 
+  static async getAllIds(): Promise<SearchResponse<unknown>> {
+    const response = await client.searchSingleIndex({
+      indexName: this.index,
+    });
+    return response;
+  }
+
   static async getSingleProduct(
     productId: string
   ): Promise<Record<string, unknown>> {

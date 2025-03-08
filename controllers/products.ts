@@ -39,15 +39,16 @@ export async function getProducts(
     algoliaOffset,
     true
   );
-  const formatResponse: getProductsResponse = {
-    products: inStockHits.hits,
-    numberOfProducts: inStockHits.nbHits,
-    limit,
-    page: inStockHits.page,
-    numberOfPages: inStockHits.nbPages,
-    query,
-  };
-  return formatResponse;
+
+  return inStockHits;
+}
+
+export async function getAllIds(): Promise<string[]> {
+  const products = await Product.getAllIds();
+  const productsIds = products.hits.map((product) => {
+    return product.objectID;
+  });
+  return productsIds;
 }
 
 export async function getSingleProduct(
