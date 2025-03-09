@@ -43,10 +43,10 @@ export async function getProducts(
   return inStockHits;
 }
 
-export async function getAllIds(): Promise<string[]> {
+export async function getAllIds(): Promise<object[]> {
   const products = await Product.getAllIds();
   const productsIds = products.hits.map((product) => {
-    return product.objectID;
+    return { params: { productId: product.objectID } };
   });
   return productsIds;
 }
