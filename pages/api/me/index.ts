@@ -4,7 +4,6 @@ import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
 import { updateUserData, getUserData } from "controllers/users";
 import methods from "micro-method-router";
 import { object, string } from "yup";
-import corsHandler from "../cors";
 
 let patchBodySchema = object({
   email: string().email().notRequired(),
@@ -20,7 +19,6 @@ let patchBodySchema = object({
   );
 const rawHandler = methods({
   async get(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
-    await corsHandler(req, res);
     const userId = payLoad.userData.id;
     const userData = await getUserData(userId);
     res.status(200).send(userData);
