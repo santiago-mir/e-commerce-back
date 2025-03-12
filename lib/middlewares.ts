@@ -4,28 +4,6 @@ import { decode } from "lib/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { AnyObject, ObjectSchema } from "yup";
 
-export function corsMiddleware(handler: any) {
-  return async (req: NextApiRequest, res: NextApiResponse) => {
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Origin", "*"); // O especifica tu frontend: "http://localhost:3000"
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PATCH, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-
-    // Manejar solicitudes OPTIONS (preflight)
-    if (req.method === "OPTIONS") {
-      return res.status(200).end();
-    }
-
-    return handler(req, res);
-  };
-}
-
 export function authMiddleware(
   callback: (
     arg0: NextApiRequest,

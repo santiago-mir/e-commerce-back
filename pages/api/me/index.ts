@@ -1,10 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { userData } from "types";
-import {
-  authMiddleware,
-  bodySchemaMiddleware,
-  corsMiddleware,
-} from "lib/middlewares";
+import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
 import { updateUserData, getUserData } from "controllers/users";
 import methods from "micro-method-router";
 import { object, string } from "yup";
@@ -41,9 +37,7 @@ const rawHandler = methods({
 
 const protectedHandler = authMiddleware(rawHandler);
 
-export default corsMiddleware(
-  methods({
-    get: protectedHandler,
-    patch: bodySchemaMiddleware(patchBodySchema, protectedHandler),
-  })
-);
+export default methods({
+  get: protectedHandler,
+  patch: bodySchemaMiddleware(patchBodySchema, protectedHandler),
+});
