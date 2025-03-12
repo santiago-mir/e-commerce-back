@@ -4,6 +4,7 @@ import { authMiddleware, bodySchemaMiddleware } from "lib/middlewares";
 import { updateUserData, getUserData } from "controllers/users";
 import methods from "micro-method-router";
 import { object, string } from "yup";
+import NextCors from "nextjs-cors";
 
 let patchBodySchema = object({
   email: string().email().notRequired(),
@@ -19,6 +20,12 @@ let patchBodySchema = object({
   );
 const rawHandler = methods({
   async get(req: NextApiRequest, res: NextApiResponse, payLoad: userData) {
+    await NextCors(req, res, {
+      // Options
+      methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+      origin: "*",
+      optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    });
     const userId = payLoad.userData.id;
     const userData = await getUserData(userId);
     res.status(200).send(userData);
