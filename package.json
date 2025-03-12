@@ -29,6 +29,7 @@
     "airtable": "^0.12.2",
     "algoliasearch": "^5.20.0",
     "ava": "^6.2.0",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.3.0",
@@ -50,6 +51,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "22.10.5",
     "@types/nodemailer": "^6.4.17",
