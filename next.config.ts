@@ -1,7 +1,11 @@
+// next.config.js
+
+// Ejemplo, si tenés otras configuraciones en tu next.config, agregá los siguiente a lo que ya tengas
 module.exports = {
   async headers() {
     return [
       {
+        // matching all API routes
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
@@ -13,7 +17,7 @@ module.exports = {
           {
             key: "Access-Control-Allow-Headers",
             value:
-              "Authorization, Content-Type, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version",
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
           },
         ],
       },
